@@ -18,7 +18,7 @@
       :root {
         --color-background-deep: #0a0a0f;
         --color-background-medium: #14141c;
-        --color-background-overlay: rgba(20, 20, 28, 0.85);
+        --color-background-overlay: rgba(20, 20, 28, 0.9);
         --color-text-primary: #e0e0e0;
         --color-text-secondary: #a0a0a0;
         --color-text-heading: #f5f5f5;
@@ -47,6 +47,7 @@
           ),
           linear-gradient(90deg, rgba(0, 240, 255, 0.03) 1px, transparent 1px);
         --background-procedural-size: 50px 50px;
+        --header-height: 70px;
       }
 
       html {
@@ -64,6 +65,7 @@
         min-height: 100vh;
         display: flex;
         flex-direction: column;
+        padding-top: var(--header-height);
       }
       main {
         flex-grow: 1;
@@ -141,7 +143,7 @@
         max-width: 1200px;
         margin-left: auto;
         margin-right: auto;
-        padding-top: 60px;
+        padding-top: 0;
         padding-bottom: 40px;
       }
 
@@ -159,7 +161,7 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
-        min-height: 50px;
+        min-height: var(--header-height);
       }
       .logo a {
         display: inline-block;
@@ -178,6 +180,8 @@
         list-style: none;
         display: flex;
         gap: 20px;
+        margin: 0; 
+        padding: 0;
       }
       #command-bar nav a {
         font-size: 0.9rem;
@@ -227,6 +231,40 @@
         transform: scale(1.1);
       }
 
+      .menu-toggle {
+        display: none;
+        background: none;
+        border: none;
+        color: var(--color-neon-cyan);
+        cursor: var(--cursor-pointer);
+        padding: 5px;
+        margin-left: 15px;
+        z-index: 1100;
+        line-height: 1;
+      }
+      .menu-toggle:hover,
+      .menu-toggle:focus {
+        color: var(--color-neon-magenta);
+      }
+      .menu-toggle .icon-bar {
+        display: block;
+        width: 22px;
+        height: 2px;
+        background-color: currentColor;
+        margin: 4px 0;
+        transition: all 0.3s ease-in-out;
+      }
+      .menu-toggle.is-active .icon-bar:nth-child(1) {
+          transform: translateY(6px) rotate(45deg);
+      }
+      .menu-toggle.is-active .icon-bar:nth-child(2) {
+          opacity: 0;
+      }
+      .menu-toggle.is-active .icon-bar:nth-child(3) {
+          transform: translateY(-6px) rotate(-45deg);
+      }
+
+
       #hero {
         min-height: 100vh;
         display: flex;
@@ -237,6 +275,8 @@
         position: relative;
         overflow: hidden;
         padding: 20px;
+        margin-top: calc(-1 * var(--header-height));
+        padding-top: var(--header-height);
       }
       #hero-canvas {
         position: absolute;
@@ -475,6 +515,78 @@
         white-space: nowrap;
       }
 
+      @media (max-width: 768px) {
+        #command-bar nav {
+          display: none; 
+          position: absolute;
+          top: 100%;
+          left: 0;
+          width: 100%;
+          background-color: var(--color-background-overlay);
+          backdrop-filter: blur(5px);
+          -webkit-backdrop-filter: blur(5px);
+          border-top: 1px solid var(--color-border-secondary);
+          padding: 10px 0;
+          box-shadow: 0 5px 10px rgba(0,0,0,0.2);
+        }
+
+        #command-bar nav.is-active {
+          display: block;
+        }
+
+        #command-bar nav ul {
+          flex-direction: column;
+          align-items: center;
+          gap: 10px;
+        }
+
+        #command-bar nav a {
+            padding: 10px 20px;
+            width: 100%;
+            text-align: center;
+        }
+
+        #command-bar nav a::after {
+            bottom: 5px;
+            left: 50%;
+            transform: translateX(-50%) scaleX(0);
+            width: 50%;
+        }
+         #command-bar nav a:hover::after,
+         #command-bar nav a:focus::after {
+            transform: translateX(-50%) scaleX(1);
+            transform-origin: center;
+        }
+
+        .menu-toggle {
+          display: block;
+          order: 3;
+        }
+
+        .social-glyphs {
+            order: 2;
+            gap: 10px;
+        }
+        .social-glyphs svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        #command-bar {
+            padding: 5px 5%;
+            min-height: 60px;
+            --header-height: 60px;
+        }
+        body {
+            padding-top: 60px;
+        }
+        #hero {
+            margin-top: -60px;
+            padding-top: 60px;
+        }
+      }
+
+
       @media (prefers-reduced-motion: reduce) {
         html {
           scroll-behavior: auto;
@@ -519,6 +631,9 @@
         .project-links a {
           transition: none;
         }
+        .menu-toggle .icon-bar {
+            transition: none !important;
+        }
       }
     </style>
   </head>
@@ -542,14 +657,14 @@
           </svg></a
         >
       </div>
-      <nav aria-label="Main Navigation">
+      <nav id="main-nav" aria-label="Main Navigation">
         <ul>
           <li><a href="#hero">Interface</a></li>
           <li><a href="#projects">Data Vault</a></li>
           <li><a href="#about">Personnel File</a></li>
         </ul>
       </nav>
-      <div class="social-glyphs">
+       <div class="social-glyphs">
         <a
           href="https://github.com/Suqbs"
           target="_blank"
@@ -581,6 +696,11 @@
               d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"
             /></svg></a>
       </div>
+      <button class="menu-toggle" aria-label="Toggle menu" aria-expanded="false" aria-controls="main-nav">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
     </header>
 
     <main id="main-content">
@@ -739,7 +859,6 @@
 
     <script>
       document.addEventListener("DOMContentLoaded", () => {
-
         const prefersReducedMotionQuery = window.matchMedia(
           "(prefers-reduced-motion: reduce)"
         );
@@ -780,8 +899,8 @@
             globalRafId = requestAnimationFrame(globalAnimate);
           } else {
             globalRafId =
-              null; 
-          } 
+              null;
+          }
         }
 
         function startGlobalAnimationLoop() {
@@ -789,7 +908,6 @@
               globalRafId =
               requestAnimationFrame(globalAnimate);
           }
-         
         }
 
         prefersReducedMotionQuery.addEventListener("change", () => {
@@ -812,7 +930,7 @@
                     e
                   );
                 }
-              } 
+              }
             }
             else if (
               !prefersReducedMotion &&
@@ -843,27 +961,27 @@
                   e
                 );
               }
-            } 
+            }
           }
           if (prefersReducedMotion && globalRafId !== null) {
             cancelAnimationFrame(globalRafId);
             globalRafId =
-              null; 
-          } 
+              null;
+          }
         });
 
         const heroCanvas = document.getElementById("hero-canvas");
         if (heroCanvas && heroCanvas.getContext) {
           const heroCtx = heroCanvas.getContext("2d");
 
-        
+
           function heroCreateParticle(x, y) {
             const state = animationStates["hero-canvas"];
             if (!state || !state.canvas) return null;
             const size = prefersReducedMotion
               ? Math.random() * 1 + 1
               : Math.random() * 2 + 1;
-            const speedMultiplier = prefersReducedMotion ? 0.2 : 1.0; 
+            const speedMultiplier = prefersReducedMotion ? 0.2 : 1.0;
             return {
               x: x ?? Math.random() * state.canvas.width,
               y: y ?? Math.random() * state.canvas.height,
@@ -876,7 +994,7 @@
               vy: (Math.random() - 0.5) * 0.5 * speedMultiplier,
             };
           }
-          
+
           function heroInitParticles() {
             const state = animationStates["hero-canvas"];
             if (!state || !state.instance) return;
@@ -936,7 +1054,7 @@
             } else {
               state.rafId = null;
             }
-          } 
+          }
           function heroDrawStatic() {
             const state = animationStates["hero-canvas"];
             if (!state || !state.ctx || !state.instance?.particles) return;
@@ -966,8 +1084,9 @@
           window.addEventListener("mousemove", (event) => {
             const state = animationStates["hero-canvas"];
             if (state?.instance?.mouse) {
-              state.instance.mouse.x = event.clientX;
-              state.instance.mouse.y = event.clientY;
+              const rect = state.canvas.getBoundingClientRect();
+              state.instance.mouse.x = event.clientX - rect.left;
+              state.instance.mouse.y = event.clientY - rect.top;
             }
           });
           window.addEventListener("mouseout", () => {
@@ -982,14 +1101,14 @@
             heroResizeCanvas();
           } catch (e) {
             console.error("Error during initial Hero resize/init:", e);
-          } 
+          }
 
           if (!prefersReducedMotion) {
             animationStates["hero-canvas"].rafId = 1;
             startGlobalAnimationLoop();
           } else {
             heroDrawStatic();
-          } 
+          }
         } else {
           console.warn("Hero canvas not found or context unavailable.");
         }
@@ -1671,6 +1790,36 @@
             timeout = setTimeout(later, wait);
           };
         }
+
+        const menuToggle = document.querySelector('.menu-toggle');
+        const mainNav = document.querySelector('#main-nav');
+
+        if (menuToggle && mainNav) {
+          menuToggle.addEventListener('click', () => {
+            const isActive = mainNav.classList.toggle('is-active');
+            menuToggle.setAttribute('aria-expanded', isActive);
+            menuToggle.classList.toggle('is-active', isActive);
+          });
+
+          mainNav.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', () => {
+              if (mainNav.classList.contains('is-active')) {
+                mainNav.classList.remove('is-active');
+                menuToggle.setAttribute('aria-expanded', 'false');
+                menuToggle.classList.remove('is-active');
+              }
+            });
+          });
+
+          document.addEventListener('click', (event) => {
+              if (!mainNav.contains(event.target) && !menuToggle.contains(event.target) && mainNav.classList.contains('is-active')) {
+                  mainNav.classList.remove('is-active');
+                  menuToggle.setAttribute('aria-expanded', 'false');
+                  menuToggle.classList.remove('is-active');
+              }
+          });
+        }
+
       });
     </script>
   </body>
